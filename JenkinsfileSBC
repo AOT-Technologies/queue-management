@@ -421,14 +421,6 @@ node {
                     echo "REMINDER_IMAGE_HASH: ${REMINDER_IMAGE_HASH}"
                     openshift.tag("${BUILDS[5]}@${REMINDER_IMAGE_HASH}", "${BUILDS[5]}:${TAG_NAMES[1]}")
                 }
-
-                def NAME_SPACE = getNameSpace()
-                openshift.withProject("${NAME_SPACE}-${DEP_ENV_NAMES[1]}") {
-                    def dc = openshift.selector('dc', "${BUILDS[5]}")
-                    // Wait for the deployment to complete.
-                    // This will wait until the desired replicas are all available
-                    dc.rollout().status()
-                }
                 echo "Appt Reminder Deployment Complete."
             }
         }
