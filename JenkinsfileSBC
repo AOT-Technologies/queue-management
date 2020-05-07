@@ -104,7 +104,7 @@ node(label) {
     }
     stage("Build Artificats..") {
         parallel (
-            script: {
+            'build_api': {
                 openshift.withCluster() {
                     openshift.withProject() {
 
@@ -116,7 +116,7 @@ node(label) {
                     echo "API Build complete ..."
                 }
             },
-            script: {
+            'build_appointment': {
                 openshift.withCluster() {
                     openshift.withProject() {
 
@@ -132,7 +132,7 @@ node(label) {
                     echo "Appointment Online complete ..."
                 }
             },
-            script: {
+            'build_reminder': {
                 openshift.withCluster() {
                     openshift.withProject() {
 
@@ -144,7 +144,7 @@ node(label) {
                     echo "Appt Reminder Build complete ..."
                 }
             },
-            script: {
+            'build_frontend': {
                 openshift.withCluster() {
                     openshift.withProject() {
 
