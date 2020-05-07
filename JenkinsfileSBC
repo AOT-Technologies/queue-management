@@ -116,34 +116,6 @@ node(label) {
                     echo "API Build complete ..."
                 }
             },
-            'build_appointment': {
-                openshift.withCluster() {
-                    openshift.withProject() {
-
-                        // Find all of the build configurations associated to the application using labels ...
-                        bc = openshift.selector("bc", "${BUILDS[3]}")
-                        echo "Started builds: ${bc.names()}"
-                        bc.startBuild("--wait").logs("-f")
-
-                        bc = openshift.selector("bc", "${BUILDS[4]}")
-                        echo "Started builds: ${bc.names()}"
-                        bc.startBuild("--wait").logs("-f")
-                    }
-                    echo "Appointment Online complete ..."
-                }
-            },
-            'build_reminder': {
-                openshift.withCluster() {
-                    openshift.withProject() {
-
-                        // Find all of the build configurations associated to the application using labels ...
-                        def bc = openshift.selector("bc", "${BUILDS[5]}")
-                        echo "Started builds: ${bc.names()}"
-                        bc.startBuild("--wait").logs("-f")
-                    }
-                    echo "Appt Reminder Build complete ..."
-                }
-            },
             'build_frontend': {
                 openshift.withCluster() {
                     openshift.withProject() {
@@ -158,6 +130,34 @@ node(label) {
                         bc.startBuild("--wait").logs("-f")
                     }
                     echo "Front End complete ..."
+                }
+            },
+            'build_appointment': {
+                openshift.withCluster() {
+                    openshift.withProject() {
+
+                        // Find all of the build configurations associated to the application using labels ...
+                        bc = openshift.selector("bc", "${BUILDS[3]}")
+                        echo "Started builds: ${bc.names()}"
+                        bc.startBuild("--wait").logs("-f")
+
+                        bc = openshift.selector("bc", "${BUILDS[4]}")
+                        echo "Started builds: ${bc.names()}"
+                        bc.startBuild("--wait").logs("-f")
+                    }
+                    echo "Appointment complete ..."
+                }
+            },
+            'build_reminder': {
+                openshift.withCluster() {
+                    openshift.withProject() {
+
+                        // Find all of the build configurations associated to the application using labels ...
+                        def bc = openshift.selector("bc", "${BUILDS[5]}")
+                        echo "Started builds: ${bc.names()}"
+                        bc.startBuild("--wait").logs("-f")
+                    }
+                    echo "Email Reminder Build complete ..."
                 }
             }
         )
