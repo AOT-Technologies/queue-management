@@ -12,11 +12,13 @@
 
 def WAIT_TIMEOUT = 10
 def TAG_NAMES = ['dev', 'test', 'production']
-def BUILDS = ['queue-management-api', 'queue-management-npm-build', 'queue-management-frontend', 'appointment-npm-build', 'appointment-frontend']
+def BUILDS = ['queue-management-api', 'queue-management-npm-build', 'queue-management-frontend', 'appointment-npm-build', 'appointment-frontend','send-appointment-reminder']
 def DEP_ENV_NAMES = ['dev', 'test', 'prod']
 def label = "mypod-${UUID.randomUUID().toString()}"
 def API_IMAGE_HASH = ""
 def FRONTEND_IMAGE_HASH = ""
+def APPOINTMENT_IMAGE_HASH = ""
+def REMINDER_IMAGE_HASH = ""
 
 String getNameSpace() {
     def NAMESPACE = sh (
@@ -64,6 +66,16 @@ node(label) {
         
     stage('SonarQube Analysis') {
         echo ">>> Performing static analysis <<<"
+        SONAR_ROUTE_NAME = 'sonarqube'
+        SONAR_ROUTE_NAMESPACE = sh (
+            script: 'oc describe configmap jenkin-config | awk  -F  "=" \'/^namespace/{print $2}\'',
+            returnStdout: true
+        ).trim()
+        SONAR_PROJECT_NAME = 'Queue Management'
+        SONAR_PROJECT_KEY = 'queue-management'
+        SONAR_PROJECT_BASE_DIR = '../'
+        SONAR_SOURCES = './'
+
         SONARQUBE_PWD = sh (
             script: 'oc set env dc/sonarqube --list | awk  -F  "=" \'/SONARQUBE_ADMINPW/{print $2}\'',
             returnStdout: true
@@ -79,8 +91,14 @@ node(label) {
 
         dir('sonar-runner') {
             sh (
-                returnStdout: true, 
-                script: "./gradlew sonarqube -Dsonar.host.url=${SONARQUBE_URL} --stacktrace --info"
+                returnStdout: true,
+                script: "./gradlew sonarqube --stacktrace --info \
+                    -Dsonar.verbose=true \
+                    -Dsonar.host.url=${SONARQUBE_URL} \
+                    -Dsonar.projectName='${SONAR_PROJECT_NAME}' \
+                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                    -Dsonar.projectBaseDir=${SONAR_PROJECT_BASE_DIR} \
+                    -Dsonar.sources=${SONAR_SOURCES}"
             )
         }
     }
@@ -121,6 +139,45 @@ node(label) {
                     dc.rollout().status()
                 }
                 echo "API Deployment Complete."
+            }
+        }
+    }
+    stage("Build Appt Reminder..") {
+        script: {
+            openshift.withCluster() {
+                openshift.withProject() {
+
+                    // Find all of the build configurations associated to the application using labels ...
+                    def bc = openshift.selector("bc", "${BUILDS[5]}")
+                    echo "Started builds: ${bc.names()}"
+                    bc.startBuild("--wait").logs("-f")
+                }
+                echo "Appt Reminder Build complete ..."
+            }
+        }
+    }
+
+    stage("Deploy Appt Reminder to Dev") {
+        script: {
+            openshift.withCluster() {
+                openshift.withProject() {
+                    echo "Tagging ${BUILDS[5]} for deployment to ${TAG_NAMES[0]} ..."
+
+                    // Don't tag with BUILD_ID so the pruner can do it's job; it won't delete tagged images.
+                    // Tag the images for deployment based on the image's hash
+                    REMINDER_IMAGE_HASH = getImageTagHash("${BUILDS[5]}")
+                    echo "REMINDER_IMAGE_HASH: ${REMINDER_IMAGE_HASH}"
+                    openshift.tag("${BUILDS[5]}@${REMINDER_IMAGE_HASH}", "${BUILDS[5]}:${TAG_NAMES[0]}")
+                }
+
+                def NAME_SPACE = getNameSpace()
+                openshift.withProject("${NAME_SPACE}-${DEP_ENV_NAMES[0]}") {
+                    def dc = openshift.selector('dc', "${BUILDS[5]}")
+                    // Wait for the deployment to complete.
+                    // This will wait until the desired replicas are all available
+                    dc.rollout().status()
+                }
+                echo "Appt Reminder Complete."
             }
         }
     }
@@ -169,7 +226,7 @@ node(label) {
         }
     }
 
-    stage("Build Online Front End..") {
+    stage("Build Appointment Front End..") {
         script: {
             openshift.withCluster() {
                 openshift.withProject() {
@@ -183,21 +240,21 @@ node(label) {
                     echo "Started builds: ${bc.names()}"
                     bc.startBuild("--wait").logs("-f")
                 }
-                echo "Front End complete ..."
+                echo "Appointment Online complete ..."
             }
         }
     }
-    stage("Deploy Appointmetn to Dev") {
+    stage("Deploy Appointment to Dev") {
         script: {
             openshift.withCluster() {
                 openshift.withProject() {
-                    echo "Tagging ${BUILDS[2]} for deployment to ${TAG_NAMES[0]} ..."
+                    echo "Tagging ${BUILDS[4]} for deployment to ${TAG_NAMES[0]} ..."
 
                     // Don't tag with BUILD_ID so the pruner can do it's job; it won't delete tagged images.
                     // Tag the images for deployment based on the image's hash
-                    FRONTEND_IMAGE_HASH = getImageTagHash("${BUILDS[4]}")
-                    echo "FRONTEND_IMAGE_HASH: ${FRONTEND_IMAGE_HASH}"
-                    openshift.tag("${BUILDS[4]}@${FRONTEND_IMAGE_HASH}", "${BUILDS[4]}:${TAG_NAMES[0]}")
+                    APPOINTMENT_IMAGE_HASH = getImageTagHash("${BUILDS[4]}")
+                    echo "APPOINTMENT_IMAGE_HASH: ${APPOINTMENT_IMAGE_HASH}"
+                    openshift.tag("${BUILDS[4]}@${APPOINTMENT_IMAGE_HASH}", "${BUILDS[4]}:${TAG_NAMES[0]}")
                 }
 
                 def NAME_SPACE = getNameSpace()
@@ -207,7 +264,7 @@ node(label) {
                     // This will wait until the desired replicas are all available
                     dc.rollout().status()
                 }
-                echo "Front End Deployment Complete."
+                echo "Appointment Online Complete."
             }
         }
     }
@@ -357,6 +414,29 @@ node {
             }
         }
     }
+    stage("Deploy Appt Reminder - test") {
+        script: {
+            openshift.withCluster() {
+                openshift.withProject() {
+                    echo "Tagging ${BUILDS[5]} for deployment to ${TAG_NAMES[1]} ..."
+
+                    // Don't tag with BUILD_ID so the pruner can do it's job; it won't delete tagged images.
+                    // Tag the images for deployment based on the image's hash
+                    echo "REMINDER_IMAGE_HASH: ${REMINDER_IMAGE_HASH}"
+                    openshift.tag("${BUILDS[5]}@${REMINDER_IMAGE_HASH}", "${BUILDS[5]}:${TAG_NAMES[1]}")
+                }
+
+                def NAME_SPACE = getNameSpace()
+                openshift.withProject("${NAME_SPACE}-${DEP_ENV_NAMES[1]}") {
+                    def dc = openshift.selector('dc', "${BUILDS[5]}")
+                    // Wait for the deployment to complete.
+                    // This will wait until the desired replicas are all available
+                    dc.rollout().status()
+                }
+                echo "Appt Reminder Deployment Complete."
+            }
+        }
+    }
     stage("Deploy Frontend - Test") {
         script: {
             openshift.withCluster() {
@@ -388,8 +468,8 @@ node {
 
                     // Don't tag with BUILD_ID so the pruner can do it's job; it won't delete tagged images.
                     // Tag the images for deployment based on the image's hash
-                    echo "FRONTEND_IMAGE_HASH: ${FRONTEND_IMAGE_HASH}"
-                    openshift.tag("${BUILDS[2]}@${FRONTEND_IMAGE_HASH}", "${BUILDS[2]}:${TAG_NAMES[1]}")
+                    echo "APPOINTMENT_IMAGE_HASH: ${APPOINTMENT_IMAGE_HASH}"
+                    openshift.tag("${BUILDS[4]}@${APPOINTMENT_IMAGE_HASH}", "${BUILDS[4]}:${TAG_NAMES[1]}")
                 }
 
                 def NAME_SPACE = getNameSpace()
@@ -412,7 +492,8 @@ node {
                     echo "Tagging Production to Stable"
                     openshift.tag("${BUILDS[0]}:production", "${BUILDS[0]}:stable")
                     openshift.tag("${BUILDS[2]}:production", "${BUILDS[2]}:stable")
-                    openshift.tag("${BUILDS[4]}:production", "${BUILDS[2]}:stable")
+                    openshift.tag("${BUILDS[4]}:production", "${BUILDS[4]}:stable")
+                    openshift.tag("${BUILDS[5]}:production", "${BUILDS[5]}:stable")
                 }
             }
         }
@@ -474,8 +555,8 @@ node {
 
                     // Don't tag with BUILD_ID so the pruner can do it's job; it won't delete tagged images.
                     // Tag the images for deployment based on the image's hash
-                    echo "FRONTEND_IMAGE_HASH: ${FRONTEND_IMAGE_HASH}"
-                    openshift.tag("${BUILDS[4]}@${FRONTEND_IMAGE_HASH}", "${BUILDS[4]}:${TAG_NAMES[2]}")
+                    echo "APPOINTMENT_IMAGE_HASH: ${APPOINTMENT_IMAGE_HASH}"
+                    openshift.tag("${BUILDS[4]}@${APPOINTMENT_IMAGE_HASH}", "${BUILDS[4]}:${TAG_NAMES[2]}")
                 }
 
                 def NAME_SPACE = getNameSpace()
@@ -486,6 +567,29 @@ node {
                     dc.rollout().status()
                 }
                 echo "Front End Deployment Complete."
+            }
+        }
+    }
+    stage("Deploy Appt Reminders - Prod") {
+        script: {
+            openshift.withCluster() {
+                openshift.withProject() {
+                    echo "Tagging ${BUILDS[5]} for deployment to ${TAG_NAMES[2]} ..."
+
+                    // Don't tag with BUILD_ID so the pruner can do it's job; it won't delete tagged images.
+                    // Tag the images for deployment based on the image's hash
+                    echo "REMINDER_IMAGE_HASH: ${REMINDER_IMAGE_HASH}"
+                    openshift.tag("${BUILDS[5]}@${REMINDER_IMAGE_HASH}", "${BUILDS[5]}:${TAG_NAMES[2]}")
+                }
+
+                def NAME_SPACE = getNameSpace()
+                openshift.withProject("${NAME_SPACE}-${DEP_ENV_NAMES[2]}") {
+                    dc = openshift.selector('dc', "${BUILDS[5]}")
+                    // Wait for the deployment to complete.
+                    // This will wait until the desired replicas are all available
+                    dc.rollout().status()
+                }
+                echo "Appt Reminders Deployment Complete."
             }
         }
     }
