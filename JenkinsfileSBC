@@ -115,7 +115,7 @@ node(label) {
                     }
                     echo "API Build complete ..."
                 }
-            }
+            },
             script: {
                 openshift.withCluster() {
                     openshift.withProject() {
@@ -131,7 +131,7 @@ node(label) {
                     }
                     echo "Appointment Online complete ..."
                 }
-            }
+            },
             script: {
                 openshift.withCluster() {
                     openshift.withProject() {
@@ -143,7 +143,7 @@ node(label) {
                     }
                     echo "Appt Reminder Build complete ..."
                 }
-            }
+            },
             script: {
                 openshift.withCluster() {
                     openshift.withProject() {
