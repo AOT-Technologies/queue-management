@@ -66,7 +66,7 @@ podTemplate(
                         openshift.withProject() {
 
                             // Find all of the build configurations associated to the application using labels ...
-                            bc = openshift.selector("bc", "${BUILDS[1]}")
+                            bc = openshift.selector("bc", "queue-management-npm-build")
                             echo "Started builds: ${bc.names()}"
                             bc.startBuild("--wait").logs("-f")
 
