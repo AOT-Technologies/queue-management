@@ -70,10 +70,10 @@ podTemplate(
                         branchedStages["${STAGE_NAME}"] = {
                             stage("Parallel Branch Stage: ${STAGE_NAME}") {
                                 // Parallel stage work here
-                                steps {
+                                script {
                                     // Find all of the build configurations associated to the application using labels ...
-                                    bc = openshift.selector("bc", "${STAGE_NAME}")
-                                    echo "Started builds: ${bc.names()}"
+                                    bc = openshift.selector("bc", "${STAGE_NAME}"),
+                                    echo "Started builds: ${bc.names()}",
                                     bc.startBuild("--wait")
                                 }
                             }
