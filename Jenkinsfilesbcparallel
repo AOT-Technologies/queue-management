@@ -87,7 +87,7 @@ podTemplate(
                             echo "Started builds: ${bc.names()}"
                             bc.startBuild("--wait").logs("-f")
                         }
-                        echo "Front End complete ..."
+                        echo "TheQ Frontend  complete ..."
                     }
                 }
             },
