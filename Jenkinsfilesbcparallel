@@ -59,10 +59,10 @@ podTemplate(
     ]
 ){
     stage ("Build The Q application") {
-        parallel api: {
-            node('API Build') {
-                script: {
-                    openshift.withCluster() {
+        openshift.withCluster() {
+            parallel api: {
+                node('API Build') {
+                    script: {
                         openshift.withProject() {
                             // Find all of the build configurations associated to the application using labels ...
                             def bc = openshift.selector("bc", "${BUILDS[0]}")
@@ -72,12 +72,10 @@ podTemplate(
                         echo "API Build complete ..."
                     }
                 }
-            }
-        },
-        reminder: {
-            node('Email Reminder Build') {
-                script: {
-                    openshift.withCluster() {
+            },
+            reminder: {
+                node('Email Reminder Build') {
+                    script: {
                         openshift.withProject() {
 
                             // Find all of the build configurations associated to the application using labels ...
