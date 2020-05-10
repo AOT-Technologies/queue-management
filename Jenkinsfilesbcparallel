@@ -70,7 +70,7 @@ podTemplate(
                             bc.startBuild("--wait") 
                         }
                     }              
-                },
+                }
                 Appmts_FrontEnd: {
                     node() {
                         script: {
