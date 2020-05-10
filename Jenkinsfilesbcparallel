@@ -68,12 +68,6 @@ podTemplate(
                             bc = openshift.selector("bc", "${BUILDS[1]}")
                             echo "Started builds: ${bc.names()}"
                             bc.startBuild()
-                        }
-                    }
-                },
-                appointments: {
-                    node() {
-                        script: {
                             // Find all of the build configurations associated to the application using labels ...
                             bc = openshift.selector("bc", "${BUILDS[3]}")
                             echo "Started builds: ${bc.names()}"
