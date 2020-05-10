@@ -72,20 +72,6 @@ podTemplate(
                         echo "TheQ Frontend complete ..."
                     }
                 }
-            },
-            Online_FrontEnd: {
-                node() {
-                    script: {
-                        openshift.withProject() {
-
-                            // Find all of the build configurations associated to the application using labels ...
-                            bc = openshift.selector("bc", "${BUILDS[3]}")
-                            echo "Started builds: ${bc.names()}"
-                            bc.startBuild("--wait")
-                        }
-                        echo "Appointment Online complete ..."
-                    }
-                }
             }
         }
     }
