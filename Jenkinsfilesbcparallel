@@ -64,17 +64,12 @@ podTemplate(
                 node() {
                     script: {
                         openshift.withProject() {
-
                             // Find all of the build configurations associated to the application using labels ...
-                            bc = openshift.selector("bc", "queue-management-npm-build")
+                            bc = openshift.selector("bc", "${BUILDS[1]}")
                             echo "Started builds: ${bc.names()}"
-                            bc.startBuild("--wait").logs("-f")
-
-                            bc = openshift.selector("bc", "${BUILDS[2]}")
-                            echo "Started builds: ${bc.names()}"
-                            bc.startBuild("--wait").logs("-f")
+                            bc.startBuild("--wait")
                         }
-                        echo "TheQ Frontend  complete ..."
+                        echo "TheQ Frontend complete ..."
                     }
                 }
             },
@@ -86,11 +81,7 @@ podTemplate(
                             // Find all of the build configurations associated to the application using labels ...
                             bc = openshift.selector("bc", "${BUILDS[3]}")
                             echo "Started builds: ${bc.names()}"
-                            bc.startBuild("--wait").logs("-f")
-
-                            bc = openshift.selector("bc", "${BUILDS[4]}")
-                            echo "Started builds: ${bc.names()}"
-                            bc.startBuild("--wait").logs("-f")
+                            bc.startBuild("--wait")
                         }
                         echo "Appointment Online complete ..."
                     }
