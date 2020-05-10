@@ -62,9 +62,9 @@ podTemplate(
         // Prealocate dict/map of branchstages
         def branchedStages = [:]
         openshift.withCluster() {
-            openshift.withProject() {
                 // Loop through all parallel branched stage names
                 for (STAGE_NAME in ["${BUILDS[0]}", "${BUILDS[1]}", "${BUILDS[3]}"]) {
+                    openshift.withProject() {
                     node() {
                         // Define and add to stages dict/map of parallel branch stages
                         branchedStages["${STAGE_NAME}"] = {
@@ -76,12 +76,12 @@ podTemplate(
                                     bc.startBuild("--wait")
                             }
                         }
-                    }
+                    }}
                 }
 
                 // Execute the stages in parallel
                 parallel branchedStages
-            }
+            
         }
     }
 }
