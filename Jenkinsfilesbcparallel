@@ -63,7 +63,7 @@ podTemplate(
         def branchedStages = [:]
 
         // Loop through all parallel branched stage names
-        for (STAGE_NAME in ["BUILDS[0]", "BUILDS[1]", "BUILDS[3]"]) {
+        for (STAGE_NAME in ["${BUILDS[0]}", "${BUILDS[1]}", "${BUILDS[3]}"]) {
 
             // Define and add to stages dict/map of parallel branch stages
             branchedStages["${STAGE_NAME}"] = {
