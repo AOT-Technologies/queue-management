@@ -71,7 +71,7 @@ podTemplate(
                     // Parallel stage work here
                     script: {
                         // Find all of the build configurations associated to the application using labels ...
-                        bc = openshift.selector("bc", "${STAGE_NAME")
+                        bc = openshift.selector("bc", "${STAGE_NAME}")
                         echo "Started builds: ${bc.names()}"
                         bc.startBuild("--wait")
                     }
