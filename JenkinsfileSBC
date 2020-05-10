@@ -107,6 +107,7 @@ podTemplate(
             stage ("Build The Q application") {
                 parallel {
                     stage("Build API..") {
+                        steps {
                         script: {
                             openshift.withCluster() {
                                 openshift.withProject() {
@@ -117,9 +118,10 @@ podTemplate(
                                 }
                                 echo "API Build complete ..."
                             }
-                        }
+                        }}
                     }
                     stage("Build Appt Reminder..") {
+                        steps {
                         script: {
                             openshift.withCluster() {
                                 openshift.withProject() {
@@ -131,9 +133,10 @@ podTemplate(
                                 }
                                 echo "Appt Reminder Build complete ..."
                             }
-                        }
+                        }}
                     }
                     stage("Build Front End..") {
+                        steps {
                         script: {
                             openshift.withCluster() {
                                 openshift.withProject() {
@@ -149,9 +152,10 @@ podTemplate(
                                 }
                                 echo "Front End complete ..."
                             }
-                        }
+                        }}
                     }
                     stage("Build Appointment") {
+                        steps {
                         script: {
                             openshift.withCluster() {
                                 openshift.withProject() {
@@ -167,7 +171,7 @@ podTemplate(
                                 }
                                 echo "Appointment Online complete ..."
                             }
-                        }
+                        }}
                     }
                 }
             }
