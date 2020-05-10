@@ -58,7 +58,7 @@ podTemplate(
         )
     ]
 ){
-    stage ("Build Frontend") {
+    stage ("Build Part 1") {
         openshift.withCluster() {
             openshift.withProject() {
                 parallel TheQ_FrontEnd: {
@@ -67,14 +67,20 @@ podTemplate(
                             // Find all of the build configurations associated to the application using labels ...
                             bc = openshift.selector("bc", "${BUILDS[1]}")
                             echo "Started builds: ${bc.names()}"
-                            bc.startBuild()
+                            bc.startBuild("--wait") 
+                        }
+                    }              
+                },
+                Appmts_FrontEnd: {
+                    node() {
+                        script: {
                             // Find all of the build configurations associated to the application using labels ...
                             bc = openshift.selector("bc", "${BUILDS[3]}")
                             echo "Started builds: ${bc.names()}"
-                            bc.startBuild()
+                            bc.startBuild("--wait")
                         }
                     }              
-                }
+                }                
             }
         }
     }
