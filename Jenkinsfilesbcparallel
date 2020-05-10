@@ -73,20 +73,6 @@ podTemplate(
                     }
                 }
             },
-            reminder: {
-                node() {
-                    script: {
-                        openshift.withProject() {
-
-                            // Find all of the build configurations associated to the application using labels ...
-                            def bc = openshift.selector("bc", "${BUILDS[5]}")
-                            echo "Started builds: ${bc.names()}"
-                            bc.startBuild("--wait").logs("-f")
-                        }
-                        echo "Appt Reminder Build complete ..."
-                    }
-                }
-            },
             TheQ_FrontEnd: {
                 node() {
                     script: {
@@ -120,6 +106,20 @@ podTemplate(
                             bc.startBuild("--wait").logs("-f")
                         }
                         echo "Appointment Online complete ..."
+                    }
+                }
+            },
+            reminder: {
+                node() {
+                    script: {
+                        openshift.withProject() {
+
+                            // Find all of the build configurations associated to the application using labels ...
+                            def bc = openshift.selector("bc", "${BUILDS[5]}")
+                            echo "Started builds: ${bc.names()}"
+                            bc.startBuild("--wait").logs("-f")
+                        }
+                        echo "Appt Reminder Build complete ..."
                     }
                 }
             }
