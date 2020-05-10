@@ -58,22 +58,9 @@ podTemplate(
         )
     ]
 ){
-    stage ("Build The Q application") {
+    stage ("Build Frontend") {
         openshift.withCluster() {
-            parallel api: {
-                node() {
-                    script: {
-                        openshift.withProject() {
-                            // Find all of the build configurations associated to the application using labels ...
-                            def bc = openshift.selector("bc", "${BUILDS[0]}")
-                            echo "Started builds: ${bc.names()}"
-                            bc.startBuild("--wait").logs("-f")
-                        }
-                        echo "API Build complete ..."
-                    }
-                }
-            },
-            TheQ_FrontEnd: {
+            parallel TheQ_FrontEnd: {
                 node() {
                     script: {
                         openshift.withProject() {
@@ -106,6 +93,25 @@ podTemplate(
                             bc.startBuild("--wait").logs("-f")
                         }
                         echo "Appointment Online complete ..."
+                    }
+                }
+            }
+        }
+    }
+}
+{
+    stage ("Build Backend") {
+        openshift.withCluster() {
+            parallel api: {
+                node() {
+                    script: {
+                        openshift.withProject() {
+                            // Find all of the build configurations associated to the application using labels ...
+                            def bc = openshift.selector("bc", "${BUILDS[0]}")
+                            echo "Started builds: ${bc.names()}"
+                            bc.startBuild("--wait").logs("-f")
+                        }
+                        echo "API Build complete ..."
                     }
                 }
             },
