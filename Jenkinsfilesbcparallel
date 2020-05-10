@@ -60,7 +60,7 @@ podTemplate(
 ){
     stage ("Build The Q application") {
         parallel api: {
-            node(label) {
+            node('API Build') {
                 script: {
                     openshift.withCluster() {
                         openshift.withProject() {
@@ -75,7 +75,7 @@ podTemplate(
             }
         },
         reminder: {
-            node(label) {
+            node('Email Reminder Build') {
                 script: {
                     openshift.withCluster() {
                         openshift.withProject() {
