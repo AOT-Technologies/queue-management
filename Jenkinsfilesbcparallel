@@ -77,7 +77,8 @@ podTemplate(
                             echo "Started builds: ${bc.names()}"
                             bc.startBuild("--wait")
                         }          
-                    }  
+                    },
+                    failFast: true|false  
                 }              
             }
         }
