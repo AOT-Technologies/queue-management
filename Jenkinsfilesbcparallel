@@ -65,20 +65,20 @@ podTemplate(
             openshift.withProject() {
                 // Loop through all parallel branched stage names
                 for (STAGE_NAME in ["${BUILDS[0]}", "${BUILDS[1]}", "${BUILDS[3]}"]) {
-
-                    // Define and add to stages dict/map of parallel branch stages
-                    branchedStages["${STAGE_NAME}"] = {
-                        stage("Parallel Branch Stage: ${STAGE_NAME}") {
-                            // Parallel stage work here
-                            script: {
-                                // Find all of the build configurations associated to the application using labels ...
-                                bc = openshift.selector("bc", "${STAGE_NAME}")
-                                echo "Started builds: ${bc.names()}"
-                                bc.startBuild("--wait")
+                    node() {
+                        // Define and add to stages dict/map of parallel branch stages
+                        branchedStages["${STAGE_NAME}"] = {
+                            stage("Parallel Branch Stage: ${STAGE_NAME}") {
+                                // Parallel stage work here
+                                script: {
+                                    // Find all of the build configurations associated to the application using labels ...
+                                    bc = openshift.selector("bc", "${STAGE_NAME}")
+                                    echo "Started builds: ${bc.names()}"
+                                    bc.startBuild("--wait")
+                                }
                             }
                         }
                     }
-
                 }
 
                 // Execute the stages in parallel
