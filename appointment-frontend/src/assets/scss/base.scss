@@ -40,6 +40,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.v-icon {
+  font-feature-settings: 'liga' !important;
+  -webkit-font-feature-settings: 'liga';
+}
+
 html {
   font-size: 14px;
 }
