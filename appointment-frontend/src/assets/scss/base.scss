@@ -35,6 +35,9 @@ html,
 body {
   min-height: 100vh;
   font-family: 'BCSans', Verdana, Arial, sans-serif; 
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }
 
 html {
