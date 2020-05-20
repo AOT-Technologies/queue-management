@@ -44,7 +44,7 @@ class OfficeSlots(Resource):
             today = datetime.datetime.now().astimezone(pytz.timezone(office.timezone.timezone_name))
 
             # Get all the dates from today until booking is allowed
-            days = [datetime.datetime.now() + datetime.timedelta(days=x) for x in range(appointments_days_limit)]
+            days = [today + datetime.timedelta(days=x) for x in range(appointments_days_limit)]
 
             # Find all appointments between the dates
             appointments = Appointment.find_appointment_availability(office_id=office_id, first_date=today,
@@ -112,7 +112,7 @@ class OfficeSlots(Resource):
 def group_appointments(appointments, timezone: str):
     filtered_appointments = {}
     for app in appointments:
-        formatted_date = app.start_time.strftime('%m/%d/%Y')
+        formatted_date = app.start_time.astimezone(pytz.timezone(timezone)).strftime('%m/%d/%Y')
         if not filtered_appointments.get(formatted_date, None):
             filtered_appointments[formatted_date] = []
         # print('app.blackout_flag', app.blackout_flag)
