@@ -23,6 +23,8 @@ Note:
 
 - if you need to use BCSC or BCeID services, please point to the dev keycloak
 
+- Get Google Map API Key from Google developer console. and use it as VUE_APP_GOOGLE_STATIC_MAP_API_KEY in .env.local file 
+
 
 
 ## Project setup
