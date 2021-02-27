@@ -26,7 +26,7 @@
                   <v-form ref="form" v-model="valid">
                     <v-row class="clickable close_btn" v-on:click="toggleFeedback()"><span class="mdi mdi-close"/></v-row>
                     <v-col class="feedback_header"><h3>{{feedbackHeader}}</h3></v-col>
-                    <v-col v-show="!showResponsePage || !responseRequired">
+                    <v-col v-if="!showResponsePage || !responseRequired">
                       <v-col>
                         <v-textarea
                             :maxlength="3000"
@@ -49,24 +49,22 @@
                           <v-radio  label="No" v-bind:value="no" @click="showResponsePage = false" ></v-radio>
                         </v-radio-group>
                     </v-row>
-                    <v-col v-if="showResponsePage && responseRequired">
-                      <!-- <v-col class="align_center"><input type="text" class="feedback_text" aria-label="name" label="Name"  v-model="name"></v-col> -->
-                      <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="name" label="Name" outlined dense :rules="nameRules" required></v-text-field></v-col></v-row>
-                      <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="email"  label="Email" outlined dense :rules="emailRules"></v-text-field></v-col></v-row>
-                      <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="phone"  label="Phone" outlined dense></v-text-field></v-col></v-row>
+                    <v-col v-if="showResponsePage">
+                      <v-text-field name="citizen-name" label="Name" v-model="citizenName" outlined dense :rules="nameRules" required></v-text-field>
+                      <v-text-field v-model="email"  label="Email" outlined dense :rules="emailRules" @blur="validateRules" @input="validateRules"></v-text-field>
+                      <v-text-field v-model="phone"  label="Phone" outlined dense :rules="phoneRules" @blur="validateRules" @input="validateRules"></v-text-field>
                       <v-row class="consent">{{consentMessage}}</v-row>
                       <v-row justify="center">
                         <v-radio-group class="no_margin" v-model="consent" :rules="consentRules" required row>
                           <v-radio  label="I Consent" v-bind:value="yes"></v-radio>
                         </v-radio-group>
-                        </v-row>
-                      <!-- <v-col><input type="radio" v-model="consent" v-bind:value="yes"><span class="feedback_caption">I Consent</span></v-col> -->
+                      </v-row>
                     </v-col>
                     <v-row class="justify-space-around">
                       <v-btn v-show="!responseRequired && !showResponsePage" @click="postFeedback"
                               color="primary"
                               width="15em"
-                              :disabled="!valid"
+                              :disabled="validateSubmit()"
                       >Submit</v-btn>
                       <v-btn v-show="responseRequired && !showResponsePage" @click="toggleResponsePage"
                               color="primary"
@@ -79,7 +77,7 @@
                       <v-btn v-show="showResponsePage" @click="postFeedback"
                               color="primary"
                               width="7em"
-                              :disabled="!valid"
+                              :disabled="validateSubmit()"
                       >Submit</v-btn>
                     </v-row>
                   </v-form>
@@ -138,9 +136,9 @@
                 </v-radio-group>
             </v-row>
             <v-col v-if="showResponsePage && responseRequired">
-              <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="name" :rules="nameRules" label="Name" outlined dense required></v-text-field></v-col></v-row>
-              <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="email" :rules="emailRules" label="Email" outlined dense required></v-text-field></v-col></v-row>
-              <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="phone" :rules="phoneRules" label="Phone" outlined dense></v-text-field></v-col></v-row>
+              <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="citizenName" :rules="nameRules" label="Name" outlined dense required></v-text-field></v-col></v-row>
+              <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="email" :rules="emailRules" label="Email" outlined dense @blur="validateRules" @input="validateRules"></v-text-field></v-col></v-row>
+              <v-row justify="center" class="align_center"><v-col cols="8"><v-text-field v-model="phone" :rules="phoneRules" label="Phone" outlined dense @blur="validateRules" @input="validateRules"></v-text-field></v-col></v-row>
               <v-row justify="center" class="consent_xs"><v-col cols="10">{{consentMessage}}</v-col></v-row>
               <v-row justify="center consent_radio_btn">
                 <v-radio-group class="no_margin" v-model="consent" row>
@@ -152,7 +150,7 @@
               <v-btn v-show="!responseRequired && !showResponsePage" @click="postFeedback"
                       color="primary"
                       width="15em"
-                      :disabled="!valid"
+                      :disabled="validateSubmit()"
               >Submit</v-btn>
               <v-btn v-show="responseRequired && !showResponsePage" @click="toggleResponsePage"
                       color="primary"
@@ -165,7 +163,7 @@
               <v-btn v-show="showResponsePage" @click="postFeedback"
                       color="primary"
                       width="7em"
-                      :disabled="!valid"
+                      :disabled="validateSubmit()"
               >Submit</v-btn>
             </v-row>
           </v-card-text>
@@ -244,7 +242,6 @@ import { th } from 'date-fns/locale'
       ],
       feedbackType: '',
       feedbackMessage: '',
-      name: '',
       email: '',
       phone: '',
       feedbackHeader: '',
@@ -261,6 +258,9 @@ import { th } from 'date-fns/locale'
   }
 })
 export default class Feedback extends Vue {
+  private emailRules
+  private phoneRules
+  private valid
   private feedbackServiceChannel: string = ConfigHelper.getFeedbackServiceChannel()
   private formEntryTime: number
   private submitComplete: boolean
@@ -269,9 +269,9 @@ export default class Feedback extends Vue {
   private feedbackMessage: string = ''
   private feedbackHeader: string = ''
   private feedbackType: string = ''
-  private name: string
-  private email: string
-  private phone: string
+  private citizenName: string = ''
+  private email: string = ''
+  private phone: string = ''
   private appointmentModule = getModule(AppointmentModule, this.$store)
   private authModule = getModule(AuthModule, this.$store)
   private showFeedbackArea = false
@@ -299,6 +299,7 @@ export default class Feedback extends Vue {
     this.submitInProgress = false
     this.feedbackType = feedbackType
     this.responseRequired = false
+    this.showResponsePage = false
     if (feedbackType === 'compliment') {
       this.feedbackHeader = 'Send us a compliment'
     }
@@ -333,7 +334,7 @@ export default class Feedback extends Vue {
     this.feedbackRequest.variables.engagement.value = this.feedbackType
     this.feedbackRequest.variables.citizen_comments.value = this.feedbackMessage + formSubmitTime
     this.feedbackRequest.variables.response.value = this.responseRequired ? 'true' : 'false'
-    this.feedbackRequest.variables.citizen_name.value = this.name === '' ? 'None' : this.name
+    this.feedbackRequest.variables.citizen_name.value = this.citizenName === '' ? 'None' : this.citizenName
     this.feedbackRequest.variables.citizen_contact.value = this.phone === '' ? 'None' : this.phone
     this.feedbackRequest.variables.citizen_email.value = this.email === '' ? 'None' : this.email
     this.feedbackRequest.variables.service_date.value = this.getCurrentDateinFormat()
@@ -348,7 +349,7 @@ export default class Feedback extends Vue {
 
   private clearFields () {
     this.feedbackMessage = ''
-    this.name = ''
+    this.citizenName = ''
     this.email = ''
     this.phone = ''
   }
@@ -388,7 +389,40 @@ export default class Feedback extends Vue {
       return 'Email or Phone no is required'
     }
   }
+  private validateRules () {
+    let phoneCondition = this.phone !== undefined && this.phone !== ''
+    let emailCondition = this.email !== undefined && this.email !== ''
+    if (emailCondition || phoneCondition) {
+      if (emailCondition) {
+        let formatResponse = /.+@.+\..+/.test(this.email) ? true : 'Email must be valid'
+        this.emailRules = [formatResponse]
+        this.phoneRules = [true]
+      }
+      if (phoneCondition) {
+        let formatResponse = /^\d{10}$/.test(this.phone) ? true : 'Phone must be valid'
+        this.phoneRules = [formatResponse]
+        this.emailRules = [true]
+      }
+    } else {
+      this.emailRules = ['Email or Phone is required']
+      this.phoneRules = ['Email or Phone is required']
+    }
+  }
+  private validateSubmit () {
+    if (this.responseRequired) {
+      return !(this.valid && this.consent)
+    } else if (!this.responseRequired) {
+      return !this.valid
+    } else {
+      return true
+    }
+  }
+
+  private showExpandedView () {
+    return this.showResponsePage && this.responseRequired
+  }
 }
+
 </script>
 
 <style lang="scss" scoped>
