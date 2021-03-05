@@ -26,5 +26,6 @@ module.exports = {
     },
     // Allow using the local proxy across other devices on LAN
     headers: { 'Access-Control-Allow-Origin': '*' }
-  }
+  },
+  productionSourceMap: false
 }
