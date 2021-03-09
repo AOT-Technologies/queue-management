@@ -5,6 +5,7 @@ WORKDIR /app
 COPY ./package*.json ./
 RUN npm install
 COPY . .
+COPY ./vue.config.prod.js ./vue.config.js
 RUN npm run build
 
 FROM docker-remote.artifacts.developer.gov.bc.ca/nginx:1.18.0 as production-stage
