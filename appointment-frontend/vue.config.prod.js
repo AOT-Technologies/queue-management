@@ -1,6 +1,7 @@
 var path = require('path')
 module.exports = {
   configureWebpack: {
+    devtool: false,
     resolve: {
       alias: {
         'vue': path.resolve('./node_modules/vue'),
@@ -25,6 +26,5 @@ module.exports = {
     },
     // Allow using the local proxy across other devices on LAN
     headers: { 'Access-Control-Allow-Origin': '*' }
-  },
-  productionSourceMap: false
+  }
 }
