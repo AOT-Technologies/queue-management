@@ -79,13 +79,13 @@ export default class ButtonsExams extends Vue {
   @Mutation('setAddExamModalSetting') public setAddExamModalSetting: any
   @Mutation('toggleGenFinReport') public toggleGenFinReport: any
 
-  handleClick (type) {
+  async handleClick (type) {
     this.setAddExamModalSetting({ setup: type })
     this.setAddExamModalSetting(true)
     if (type === 'pesticide') {
-      this.$store.dispatch('getPesticideExamTypes')
-      this.$store.dispatch('getPesticideOfficeInvigilators')
-      this.$store.dispatch('getPesticideOffsiteInvigilators')
+      await this.$store.dispatch('getPesticideExamTypes')
+      await this.$store.dispatch('getPesticideOfficeInvigilators')
+      await this.$store.dispatch('getPesticideOffsiteInvigilators')
     }
   }
 
