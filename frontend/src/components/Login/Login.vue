@@ -109,11 +109,19 @@ limitations under the License.*/
 </template>
 
 <script lang="ts">
+<<<<<<< HEAD
 import VueBootstrapTypeahead from "vue-bootstrap-typeahead";
 import { Action, Getter, Mutation, State } from "vuex-class";
 import { Component, Vue } from "vue-property-decorator";
 import config from "../../../config";
 import _ from "lodash";
+=======
+import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
+import { Action, Getter, Mutation, State } from 'vuex-class'
+import { Component, Vue } from 'vue-property-decorator'
+import config from '../../../config'
+import _ from 'lodash'
+>>>>>>> upstream-master-bc
 
 @Component({
   components: {
@@ -121,6 +129,7 @@ import _ from "lodash";
   }
 })
 export default class Login extends Vue {
+<<<<<<< HEAD
   @State("user") private user!: any;
   @State("csr_states") private csr_states!: any;
   @State("showOfficeSwitcher") private showOfficeSwitcher!: boolean;
@@ -148,6 +157,35 @@ export default class Login extends Vue {
   officeQuery = "";
 
   get counterSelection() {
+=======
+  @State('user') private user!: any;
+  @State('csr_states') private csr_states!: any;
+  @State('showOfficeSwitcher') private showOfficeSwitcher!: boolean;
+  @State('offices') private offices!: any;
+
+  @Getter('role_code') private role_code!: any;
+  @Getter('quick_trans_status') private quick_trans_status!: any;
+  @Getter('reception') private reception!: any;
+  @Getter('receptionist_status') private receptionist_status!: any;
+  @Getter('citizens_queue') private citizens_queue!: any;
+
+  @Action('updateCSRCounterTypeState') public updateCSRCounterTypeState: any;
+  @Action('updateCSRState') public updateCSRState: any;
+  @Action('updateCSROffice') public updateCSROffice: any;
+  @Action('getOffices') public getOffices: any;
+
+  @Mutation('setQuickTransactionState') public setQuickTransactionState: any;
+  @Mutation('setReceptionistState') public setReceptionistState: any;
+  @Mutation('setCSRState') public setCSRState: any;
+  @Mutation('setUserCSRStateName') public setUserCSRStateName: any;
+  @Mutation('setCounterStatusState') public setCounterStatusState: any;
+  @Mutation('setOfficeSwitcher') public setOfficeSwitcher: any;
+
+  $keycloak: any;
+  officeQuery = '';
+
+  get counterSelection () {
+>>>>>>> upstream-master-bc
     if (this.receptionist_status === true) {
       return "receptionist";
     } else {
@@ -155,9 +193,15 @@ export default class Login extends Vue {
     }
   }
 
+<<<<<<< HEAD
   set counterSelection(value) {
     if (value === "receptionist") {
       this.setReceptionistState(true);
+=======
+  set counterSelection (value) {
+    if (value === 'receptionist') {
+      this.setReceptionistState(true)
+>>>>>>> upstream-master-bc
     } else {
       this.setCounterStatusState(value);
       this.setReceptionistState(false);
@@ -213,11 +257,11 @@ export default class Login extends Vue {
       if (timeUntilExp > 30) {
         this.$keycloak
           .init({
-            responseMode: "fragment",
-            flow: "standard",
-            refreshToken: sessionStorage.getItem("refreshToken"),
-            token: sessionStorage.getItem("token"),
-            tokenExp: sessionStorage.getItem("tokenExp")
+            responseMode: 'fragment',
+            flow: 'standard',
+            refreshToken: sessionStorage.getItem('refreshToken'),
+            token: sessionStorage.getItem('token'),
+            tokenExp: sessionStorage.getItem('tokenExp')
           })
           .success(() => {
             // Set a timer to auto-refresh the token
@@ -238,21 +282,21 @@ export default class Login extends Vue {
     }
   }
 
-  init() {
+  init () {
     this.$keycloak
       .init({
-        responseMode: "fragment",
-        flow: "standard",
-        onLoad: "check-sso"
+        responseMode: 'fragment',
+        flow: 'standard',
+        onLoad: 'check-sso'
       })
       .success(() => {
         setInterval(() => {
-          this.refreshToken(config.REFRESH_TOKEN_SECONDS_LEFT);
-        }, 60 * 1000);
-      });
+          this.refreshToken(config.REFRESH_TOKEN_SECONDS_LEFT)
+        }, 60 * 1000)
+      })
   }
 
-  setupKeycloakCallbacks() {
+  setupKeycloakCallbacks () {
     // authenticated
     this.$keycloak.onAuthSuccess = () => {
       this.$store.dispatch("logIn", this.$keycloak.token);
@@ -331,54 +375,54 @@ export default class Login extends Vue {
     this.updateCSRState();
   }
 
-  refreshToken(minValidity: any) {
+  refreshToken (minValidity: any) {
     const secondsLeft = Math.round(
       this.$keycloak.tokenParsed.exp +
         this.$keycloak.timeSkew -
         new Date().getTime() / 1000
-    );
+    )
     console.log(
-      "==> Updating token.  Currently valid for " + secondsLeft + " seconds"
-    );
+      '==> Updating token.  Currently valid for ' + secondsLeft + ' seconds'
+    )
     this.$keycloak
       .updateToken(minValidity)
       .success((refreshed: any) => {
         if (refreshed) {
-          console.log("Token refreshed and is below");
-          console.log(this.$keycloak.tokenParsed);
-          console.log("Refresh token is below");
-          console.log(this.$keycloak.refreshTokenParsed);
+          console.log('Token refreshed and is below')
+          console.log(this.$keycloak.tokenParsed)
+          console.log('Refresh token is below')
+          console.log(this.$keycloak.refreshTokenParsed)
         } else {
-          console.log("Token not refreshed");
+          console.log('Token not refreshed')
         }
         const secondsLeft = Math.round(
           this.$keycloak.tokenParsed.exp +
             this.$keycloak.timeSkew -
             new Date().getTime() / 1000
-        );
+        )
         console.log(
-          "    --> After refresh.  Token now valid for " +
+          '    --> After refresh.  Token now valid for ' +
             secondsLeft +
-            " seconds"
-        );
+            ' seconds'
+        )
       })
       .error((error: any) => {
-        console.log("Failed to refresh token");
-        console.log(error);
+        console.log('Failed to refresh token')
+        console.log(error)
         const secondsLeft = Math.round(
           this.$keycloak.tokenParsed.exp +
             this.$keycloak.timeSkew -
             new Date().getTime() / 1000
-        );
+        )
         console.log(
-          "    --> After refresh.  Token now valid for " +
+          '    --> After refresh.  Token now valid for ' +
             secondsLeft +
-            " seconds"
-        );
+            ' seconds'
+        )
         if (secondsLeft < 90) {
-          this.logoutTokenExpired();
+          this.logoutTokenExpired()
         }
-      });
+      })
   }
 
   created() {
@@ -404,32 +448,32 @@ export default class Login extends Vue {
     }
   }
 
-  cancelOfficeSwitcher() {
-    this.setOfficeSwitcher(false);
+  cancelOfficeSwitcher () {
+    this.setOfficeSwitcher(false)
   }
 
-  changeOffice(newOffice) {
+  changeOffice (newOffice) {
     this.updateCSROffice(newOffice)
       .then(() => {
-        console.log("Done updateCSROffice() then in Login.vue");
-        this.setOfficeSwitcher(false);
+        console.log('Done updateCSROffice() then in Login.vue')
+        this.setOfficeSwitcher(false)
         // Auto-refresh to reload all new data now that office has changed
-        window.location.reload();
+        window.location.reload()
       })
       .catch(err => {
-        let message = "Something went wrong";
+        let message = 'Something went wrong'
         if (
           err &&
           err.response &&
           err.response.data &&
           err.response.data.message
         ) {
-          message = err.response.data.message;
+          message = err.response.data.message
         }
-        alert("Unable to change offices: " + message);
-        console.error("Unable to change offices: " + message, { err });
-        this.setOfficeSwitcher(false);
-      });
+        alert('Unable to change offices: ' + message)
+        console.error('Unable to change offices: ' + message, { err })
+        this.setOfficeSwitcher(false)
+      })
   }
 }
 </script>
