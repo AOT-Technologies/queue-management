@@ -14,21 +14,6 @@ limitations under the License. */
 
 /*eslint-disable */
 /*tslint-disable */
-<<<<<<< HEAD
-import "babel-polyfill"; // For IE11 compat
-import "./router/componentHooks"; // <-- Needs to be first to work beforeRouteLeave
-import "core-js/stable"; // For IE11 compat
-
-import Vue from "vue";
-import vuetify from "./plugins/vuetify";
-import Buefy from "buefy";
-import "es6-promise/auto";
-import store from "./store/index";
-import BootstrapVue from "bootstrap-vue";
-import router from "./router";
-import { Plugin } from "vue-fragment";
-import { library } from "@fortawesome/fontawesome-svg-core";
-=======
 import 'babel-polyfill'; // For IE11 compat
 import './router/componentHooks'; // <-- Needs to be first to work beforeRouteLeave
 import 'core-js/stable'; // For IE11 compat
@@ -42,7 +27,6 @@ import BootstrapVue from 'bootstrap-vue';
 import router from './router';
 import { Plugin } from 'vue-fragment';
 import { library } from '@fortawesome/fontawesome-svg-core';
->>>>>>> upstream-master-bc
 import {
   faAngleLeft,
   faAngleRight,

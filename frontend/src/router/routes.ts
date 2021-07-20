@@ -1,38 +1,36 @@
 /* tslint-disable */
-import Admin from "../views/admin.vue";
-import Agenda from "@/components/Agenda/Agenda.vue";
-import App from "../views/App.vue";
-import Appointments from "../components/Appointments/appointments.vue";
+import Admin from '../views/admin.vue'
+import Agenda from '@/components/Agenda/Agenda.vue'
+import App from '../views/App.vue'
+import Appointments from '../components/Appointments/appointments.vue'
 
-import ButtonsAdmin from "../views/buttons-admin.vue";
-import ButtonsAgenda from "@/components/Agenda/buttons-agenda.vue";
-import ButtonsAppointments from "../components/Appointments/buttons-appointments.vue";
-import ButtonsCalendar from "../components/Booking/buttons-calendar.vue";
-import ButtonsDash from "@/components/ServeCitizen/dash-buttons.vue";
-import ButtonsExams from "../components/exams/buttons-exams.vue";
-import ButtonsUpload from "@/components/upload/buttons-upload.vue";
+import ButtonsAdmin from '../views/buttons-admin.vue'
+import ButtonsAgenda from '@/components/Agenda/buttons-agenda.vue'
+import ButtonsAppointments from '../components/Appointments/buttons-appointments.vue'
+import ButtonsCalendar from '../components/Booking/buttons-calendar.vue'
+import ButtonsDash from '@/components/ServeCitizen/dash-buttons.vue'
+import ButtonsExams from '../components/exams/buttons-exams.vue'
+import ButtonsUpload from '@/components/upload/buttons-upload.vue'
 
-import Calendar from "../components/Booking/calendar.vue";
-import Dash from "@/components/ServeCitizen/dash.vue";
-import Exams from "../components/exams/exams.vue";
-import Smartboard from "@/components/smartboard/index.vue";
+import Calendar from '../components/Booking/calendar.vue'
+import Dash from '@/components/ServeCitizen/dash.vue'
+import Exams from '../components/exams/exams.vue'
+import Smartboard from '@/components/smartboard/index.vue'
 
-import Upload from "@/components/upload/upload.vue";
-import Tasklist from "@/views/TaskList.vue";
-import ButtonTasklist from "@/components/TaskList/ButtonTasklist.vue";
-
-import FormView from "@/views/FormView.vue";
+import Upload from '@/components/upload/upload.vue'
+import Tasklist from '@/views/TaskList.vue'
+import ButtonTasklist from '@/components/TaskList/ButtonTasklist.vue'
 
 import FormView from '@/views/FormView.vue'
 
 export const routes = [
   {
-    path: "/",
+    path: '/',
     component: App,
-    redirect: "/queue",
+    redirect: '/queue',
     children: [
       {
-        path: "queue",
+        path: 'queue',
         components: {
           default: Dash,
           buttons: ButtonsDash
@@ -40,7 +38,7 @@ export const routes = [
         meta: { hideCitizenWaiting: true }
       },
       {
-        path: "admin",
+        path: 'admin',
         components: {
           default: Admin,
           buttons: ButtonsAdmin
@@ -48,7 +46,7 @@ export const routes = [
         meta: { hideCitizenWaiting: true }
       },
       {
-        path: "exams",
+        path: 'exams',
         components: {
           default: Exams,
           buttons: ButtonsExams
@@ -56,7 +54,7 @@ export const routes = [
         meta: { hideCitizenWaiting: false }
       },
       {
-        path: "agenda",
+        path: 'agenda',
         components: {
           default: Agenda,
           buttons: ButtonsAgenda
@@ -64,7 +62,7 @@ export const routes = [
         meta: { hideCitizenWaiting: true }
       },
       {
-        path: "appointments",
+        path: 'appointments',
         components: {
           default: Appointments,
           buttons: ButtonsAppointments
@@ -72,7 +70,7 @@ export const routes = [
         meta: { hideCitizenWaiting: true }
       },
       {
-        path: "booking",
+        path: 'booking',
         components: {
           default: Calendar,
           buttons: ButtonsCalendar
@@ -80,7 +78,7 @@ export const routes = [
         meta: { hideCitizenWaiting: false }
       },
       {
-        path: "upload",
+        path: 'upload',
         components: {
           default: Upload,
           buttons: ButtonsUpload
@@ -105,7 +103,7 @@ export const routes = [
         meta: { hideCitizenWaiting: false }
       },
       {
-        path: "form/:form_id/submission/:submission_id",
+        path: 'form/:form_id/submission/:submission_id',
         components: {
           default: FormView,
           buttons: ButtonTasklist
@@ -115,12 +113,12 @@ export const routes = [
     ]
   },
   {
-    path: "/smartboard/:office_number",
+    path: '/smartboard/:office_number',
     component: Smartboard,
     props: true
   },
   {
-    path: "/smartboard/",
+    path: '/smartboard/',
     component: Smartboard
   }
-];
+]
